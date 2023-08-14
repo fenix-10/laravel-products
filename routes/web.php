@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Category\StoreController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categories'], function () {
+    Route::post('/', StoreController::class);
 });
