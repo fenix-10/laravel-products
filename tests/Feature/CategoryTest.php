@@ -60,4 +60,30 @@ class CategoryTest extends TestCase
 
         $this->assertEquals($category->id, $updCategory->id);
     }
+
+    /** @test */
+    public function response_for_route_category_index_is_view_category_index_with_categories()
+    {
+        $this->withoutExceptionHandling();
+
+        $category = Category::factory(10)->create();
+
+        $response = $this->get('/categories');
+        $response->assertViewIs('category.index');
+        $response->assertSeeText('This is index page');
+    }
+
+    /** @test */
+    public function response_for_route_categories_show_is_view_categories_show_with_single_category()
+    {
+        $this->withoutExceptionHandling();
+
+        $category = Category::factory()->create();
+
+        $response = $this->get('/categories/' . $category->id);
+
+        $response->assertViewIs('category.show');
+        $response->assertSeeText('This is show page');
+        $response->assertSeeText($category->title);
+    }
 }

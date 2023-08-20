@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Category\IndexController;
+use App\Http\Controllers\Category\ShowController;
 use App\Http\Controllers\Category\StoreController;
 use App\Http\Controllers\Category\UpdateController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +22,8 @@ Route::get('/', function () {
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categories'], function () {
+    Route::get('/', IndexController::class);
     Route::post('/', StoreController::class);
+    Route::get('/{category}', ShowController::class);
     Route::patch('/{category}', UpdateController::class);
 });
