@@ -40,4 +40,24 @@ class CategoryTest extends TestCase
         $response->assertRedirect();
         $response->assertInvalid('title');
     }
+
+    /** @test */
+    public function a_category_can_be_updated()
+    {
+        $this->withoutExceptionHandling();
+
+        $category = Category::factory()->create();
+
+        $data = [
+          'title' => 'updated title'
+        ];
+
+        $response = $this->patch('/categories/' . $category->id, $data);
+        $response->assertOk();
+
+        $updCategory = Category::first();
+        $this->assertEquals($data['title'], $updCategory->title);
+
+        $this->assertEquals($category->id, $updCategory->id);
+    }
 }
