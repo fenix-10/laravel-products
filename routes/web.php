@@ -39,6 +39,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categ
     Route::delete('/{category}', DeleteController::class)->name('categories.delete')->middleware('auth');
 });
 
+Route::group(['namespace' => 'App\Http\Controllers\Tag', 'prefix' => 'tags'], function () {
+    Route::post('/', \App\Http\Controllers\Tag\StoreController::class)->name('tags.store');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
