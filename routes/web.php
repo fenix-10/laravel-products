@@ -41,6 +41,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categ
 
 Route::group(['namespace' => 'App\Http\Controllers\Tag', 'prefix' => 'tags'], function () {
     Route::post('/', \App\Http\Controllers\Tag\StoreController::class)->name('tags.store');
+    Route::patch('/{tag}', \App\Http\Controllers\Tag\UpdateController::class)->name('tags.update');
 });
 
 Route::middleware('auth')->group(function () {
