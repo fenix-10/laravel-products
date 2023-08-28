@@ -56,4 +56,43 @@ class TagTest extends TestCase
 
         $this->assertEquals($tag->id, $updTag->id);
     }
+
+    /** @test */
+    public function response_for_route_tag_index_is_view_tag_index()
+    {
+        $this->withoutExceptionHandling();
+
+        $tags = Tag::factory(10)->create();
+
+        $response = $this->get('/tags');
+        $response->assertViewIs('tag.index');
+        $response->assertSeeText('This is index page');
+
+        $titles = $tags->pluck('title')->toArray();
+        $response->assertSeeText($titles);
+    }
+
+    /** @test */
+    public function response_for_route_tag_show_is_view_with_single_tag_show()
+    {
+        $this->withoutExceptionHandling();
+
+        $tag = Tag::factory()->create();
+        $response = $this->get('/tags/' . $tag->id);
+        $response->assertViewIs('tag.show');
+        $response->assertSeeText('This is show page');
+
+    }
+
+    /** @test */
+    public function response_for_route_tag_edit_is_view_tag_edit()
+    {
+        $this->withoutExceptionHandling();
+
+        $tag = Tag::factory()->create();
+
+        $response = $this->get('/tags/' . $tag->id . '/edit');
+        $response->assertViewIs('tag.edit');
+        $response->assertSeeText('This is tag edit page');
+    }
 }
