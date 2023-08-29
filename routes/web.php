@@ -41,9 +41,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categ
 
 Route::group(['namespace' => 'App\Http\Controllers\Tag', 'prefix' => 'tags'], function () {
     Route::get('/', \App\Http\Controllers\Tag\IndexController::class)->name('tags.index');
+    Route::get('/create', \App\Http\Controllers\Tag\CreateController::class)->name('tags.create')->middleware('auth');
     Route::post('/', \App\Http\Controllers\Tag\StoreController::class)->name('tags.store');
     Route::get('/{tag}', \App\Http\Controllers\Tag\ShowController::class)->name('tags.show');
-    Route::get('/{tag}/edit', \App\Http\Controllers\Tag\EditController::class)->name('tags.edit');
+    Route::get('/{tag}/edit', \App\Http\Controllers\Tag\EditController::class)->name('tags.edit')->middleware('auth');
     Route::patch('/{tag}', \App\Http\Controllers\Tag\UpdateController::class)->name('tags.update');
     Route::delete('/{tag}', \App\Http\Controllers\Tag\DeleteController::class)->name('tags.delete')->middleware('auth');
 });
