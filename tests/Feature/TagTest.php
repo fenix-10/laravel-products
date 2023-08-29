@@ -17,12 +17,13 @@ class TagTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $user = User::factory()->create();
 
         $data = [
           'title' => 'some title'
         ];
 
-        $response = $this->post('/tags', $data);
+        $response = $this->actingAs($user)->post('/tags', $data);
         $response->assertOk();
 
         $this->assertDatabaseCount('tags', 1);
@@ -31,12 +32,15 @@ class TagTest extends TestCase
     /** @test */
     public function attr_title_is_required_for_storing_tag()
     {
+        $user = User::factory()->create();
+
         $data = [
             'title' => ''
         ];
 
-        $response = $this->post('/tags', $data);
+        $response = $this->actingAs($user)->post('/tags', $data);
         $response->assertRedirect();
+        $response->assertInvalid('title');
     }
 
     /** @test */
@@ -44,7 +48,7 @@ class TagTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-
+        $user = User::factory()->create();
 
         $tag = Tag::factory()->create();
 
@@ -52,7 +56,7 @@ class TagTest extends TestCase
             'title' => 'updated title'
         ];
 
-        $response = $this->patch('/tags/' . $tag->id, $data);
+        $response = $this->actingAs($user)->patch('/tags/' . $tag->id, $data);
         $response->assertOk();
 
         $updTag = Tag::first();
@@ -154,5 +158,32 @@ class TagTest extends TestCase
 
         $response = $this->get('/tags/' . $tag->id . '/edit');
         $response->assertRedirect();
+    }
+    /** @test */
+    public function a_tag_can_be_stored_by_only_auth_user()
+    {
+        $data = [
+            'title' => 'some title'
+        ];
+
+        $response = $this->post('/tags', $data);
+        $response->assertRedirect();
+
+        $this->assertDatabaseCount('tags', 0);
+
+    }
+
+    /** @test */
+    public function a_tag_can_be_updated_by_only_auth_user()
+    {
+        $tag = Tag::factory()->create();
+
+        $data = [
+            'title' => 'updated title'
+        ];
+
+        $response = $this->patch('/tags/' . $tag->id, $data);
+        $response->assertRedirect();
+
     }
 }
