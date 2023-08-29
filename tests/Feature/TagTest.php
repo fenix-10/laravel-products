@@ -17,6 +17,7 @@ class TagTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+
         $data = [
           'title' => 'some title'
         ];
@@ -42,6 +43,8 @@ class TagTest extends TestCase
     public function a_tag_can_be_updated()
     {
         $this->withoutExceptionHandling();
+
+
 
         $tag = Tag::factory()->create();
 
@@ -86,13 +89,27 @@ class TagTest extends TestCase
     }
 
     /** @test */
+    public function response_for_route_tag_create_is_view_tag_create()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/tags/create');
+        $response->assertViewIs('tag.create');
+        $response->assertSeeText('This is create page');
+    }
+
+    /** @test */
     public function response_for_route_tag_edit_is_view_tag_edit()
     {
         $this->withoutExceptionHandling();
 
+        $user = User::factory()->create();
+
         $tag = Tag::factory()->create();
 
-        $response = $this->get('/tags/' . $tag->id . '/edit');
+        $response = $this->actingAs($user)->get('/tags/' . $tag->id . '/edit');
         $response->assertViewIs('tag.edit');
         $response->assertSeeText('This is tag edit page');
     }
@@ -121,5 +138,21 @@ class TagTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseCount('tags', 1);
+    }
+
+    /** @test */
+    public function a_view_tag_create_can_be_seen_by_only_auth_user()
+    {
+        $response = $this->get('/tags/create');
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_view_tag_edit_can_be_seen_by_only_auth_user()
+    {
+        $tag = Tag::factory()->create();
+
+        $response = $this->get('/tags/' . $tag->id . '/edit');
+        $response->assertRedirect();
     }
 }
