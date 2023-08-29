@@ -45,6 +45,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Tag', 'prefix' => 'tags'], fu
     Route::get('/{tag}', \App\Http\Controllers\Tag\ShowController::class)->name('tags.show');
     Route::get('/{tag}/edit', \App\Http\Controllers\Tag\EditController::class)->name('tags.edit');
     Route::patch('/{tag}', \App\Http\Controllers\Tag\UpdateController::class)->name('tags.update');
+    Route::delete('/{tag}', \App\Http\Controllers\Tag\DeleteController::class)->name('tags.delete')->middleware('auth');
 });
 
 Route::middleware('auth')->group(function () {

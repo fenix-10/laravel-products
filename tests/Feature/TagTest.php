@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -94,5 +95,31 @@ class TagTest extends TestCase
         $response = $this->get('/tags/' . $tag->id . '/edit');
         $response->assertViewIs('tag.edit');
         $response->assertSeeText('This is tag edit page');
+    }
+
+    /** @test */
+    public function a_tag_can_be_deleted_by_auth_user()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+
+        $tag = Tag::factory()->create();
+
+        $response = $this->actingAs($user)->delete('/tags/' . $tag->id);
+        $response->assertRedirect();
+
+        $this->assertSoftDeleted('tags');
+    }
+
+    /** @test */
+    public function a_tag_can_be_deleted_by_only_auth_user()
+    {
+        $tag = Tag::factory()->create();
+
+        $response = $this->delete('/tags/' . $tag->id);
+        $response->assertRedirect();
+
+        $this->assertDatabaseCount('tags', 1);
     }
 }

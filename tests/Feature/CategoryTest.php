@@ -122,6 +122,8 @@ class CategoryTest extends TestCase
         $response = $this->actingAs($user)->delete('/categories/' . $category->id);
         $response->assertRedirect();
 
+        $this->assertSoftDeleted('categories');
+
     }
 
     /** @test */
