@@ -32,10 +32,10 @@ Route::get('/dashboard', function () {
 Route::group(['namespace' => 'App\Http\Controllers\Category', 'prefix' => 'categories'], function () {
     Route::get('/', IndexController::class)->name('categories.index');
     Route::get('/create', CreateController::class)->name('categories.create')->middleware('auth');
-    Route::post('/', StoreController::class)->name('categories.store');
+    Route::post('/', StoreController::class)->name('categories.store')->middleware('auth');
     Route::get('/{category}', ShowController::class)->name('categories.show');
     Route::get('/{category}/edit', EditController::class)->name('categories.edit')->middleware('auth');
-    Route::patch('/{category}', UpdateController::class)->name('categories.update');
+    Route::patch('/{category}', UpdateController::class)->name('categories.update')->middleware('auth');
     Route::delete('/{category}', DeleteController::class)->name('categories.delete')->middleware('auth');
 });
 
