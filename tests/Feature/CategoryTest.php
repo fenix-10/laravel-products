@@ -93,7 +93,9 @@ class CategoryTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->get('/categories/create');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/categories/create');
         $response->assertViewIs('category.create');
         $response->assertSeeText('This is create page');
     }
@@ -103,9 +105,11 @@ class CategoryTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $user = User::factory()->create();
+
         $category = Category::factory()->create();
 
-        $response = $this->get('/categories/' . $category->id . '/edit');
+        $response = $this->actingAs($user)->get('/categories/' . $category->id . '/edit');
         $response->assertViewIs('category.edit');
         $response->assertSeeText('This is edit page');
     }
@@ -135,5 +139,21 @@ class CategoryTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseCount('categories', 1);
+    }
+
+    /** @test */
+    public function a_view_category_create_can_be_seen_by_only_auth_user()
+    {
+        $response = $this->get('/categories/create');
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_view_category_edit_can_be_seen_by_only_auth_user()
+    {
+        $category = Category::factory()->create();
+
+        $response = $this->get('/categories/' . $category->id . '/edit');
+        $response->assertRedirect();
     }
 }
