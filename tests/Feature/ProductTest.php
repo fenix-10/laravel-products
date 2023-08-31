@@ -135,17 +135,15 @@ class ProductTest extends TestCase
 
         $file = File::create('image.jpg');
 
-        Category::factory()->create();
+        $newCategoryId = Category::factory()->create()->id;
 
-        $product = Product::factory()
-            ->for(Category::factory()->create())
-            ->create();
+        $product = Product::factory()->create();
 
         $data = [
             'title' => 'upd title',
             'description' => 'upd desc',
             'image' => $file,
-            'category_id' => 2,
+            'category_id' => $newCategoryId,
         ];
 
         $response = $this->patch('/products/' . $product->id, $data);
