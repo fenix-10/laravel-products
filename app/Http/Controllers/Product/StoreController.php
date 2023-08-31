@@ -14,9 +14,7 @@ class StoreController extends Controller
     {
         $data = $request->validated();
 
-        if (!empty($data['image'])) {
-            Storage::disk('local')->put('/images', $data['image']);
-        }
+        $data['image'] = Storage::disk('local')->put('/images', $data['image']);
 
         Product::create($data);
     }
