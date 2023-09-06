@@ -149,4 +149,63 @@ class ProductTest extends TestCase
         $response = $this->patch('/products/' . $product->id, $data);
         $response->assertOk();
     }
+
+    /** @test */
+    public function response_for_route_product_index_is_product_index_view()
+    {
+        $this->withoutExceptionHandling();
+
+        $products = Product::factory(10)->create();
+
+        $response = $this->get('/products');
+        $response->assertViewIs('product.index');
+        $response->assertSeeText('This is index page');
+
+        $titles = $products->pluck('title')->toArray();
+        $response->assertSeeText($titles);
+
+        $descriptions = $products->pluck('description')->toArray();
+        $response->assertSeeText($descriptions);
+    }
+
+    /** @test */
+    public function response_for_route_product_show_is_view_post_show()
+    {
+        $this->withoutExceptionHandling();
+
+        $product = Product::factory()->create();
+
+        $response = $this->get('/products/' . $product->id);
+        $response->assertViewIs('product.show');
+        $response->assertSeeText('This is show page');
+
+        $title = $product->pluck('title')->toArray();
+        $response->assertSeeText($title);
+
+        $description = $product->pluck('description')->toArray();
+        $response->assertSeeText($description);
+    }
+
+    /** @test */
+    public function response_for_route_product_edit_is_product_edit_view()
+    {
+        $this->withoutExceptionHandling();
+
+        $product = Product::factory()->create();
+
+        $response = $this->get('/product/' . $product->id . '/edit');
+        $response->assertViewIs('product.edit');
+        $response->assertSeeText('This is edit page');
+    }
+
+    /** @test */
+    public function response_for_route_products_create_is_view_product_create()
+    {
+        $this->withoutExceptionHandling();
+
+        $response = $this->get('/product/create');
+        $response->assertViewIs('product.create');
+        $response->assertSeeText('This is create page');
+    }
+
 }
