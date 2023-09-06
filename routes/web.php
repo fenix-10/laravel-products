@@ -50,7 +50,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Tag', 'prefix' => 'tags'], fu
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Product', 'prefix' => 'products'], function () {
+    Route::get('/', \App\Http\Controllers\Product\IndexController::class)->name('products.index');
+    Route::get('/create', \App\Http\Controllers\Product\CreateController::class)->name('products.create');
     Route::post('/', \App\Http\Controllers\Product\StoreController::class)->name('products.store');
+    Route::get('/{product}', \App\Http\Controllers\Product\ShowController::class)->name('products.show');
     Route::patch('/{product}', \App\Http\Controllers\Product\UpdateController::class)->name('products.update');
 });
 
