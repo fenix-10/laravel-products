@@ -54,7 +54,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Product', 'prefix' => 'produc
     Route::get('/create', \App\Http\Controllers\Product\CreateController::class)->name('products.create');
     Route::post('/', \App\Http\Controllers\Product\StoreController::class)->name('products.store');
     Route::get('/{product}', \App\Http\Controllers\Product\ShowController::class)->name('products.show');
+    Route::get('/{product}/edit', \App\Http\Controllers\Product\EditController::class)->name('products.edit');
     Route::patch('/{product}', \App\Http\Controllers\Product\UpdateController::class)->name('products.update');
+    Route::delete('/{product}', \App\Http\Controllers\Product\DeleteController::class)->name('products.delete')->middleware('auth');
 });
 
 Route::middleware('auth')->group(function () {

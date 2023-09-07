@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Testing\File;
@@ -193,7 +194,7 @@ class ProductTest extends TestCase
 
         $product = Product::factory()->create();
 
-        $response = $this->get('/product/' . $product->id . '/edit');
+        $response = $this->get('/products/' . $product->id . '/edit');
         $response->assertViewIs('product.edit');
         $response->assertSeeText('This is edit page');
     }
@@ -203,9 +204,30 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->get('/product/create');
+        $response = $this->get('/products/create');
         $response->assertViewIs('product.create');
         $response->assertSeeText('This is create page');
+    }
+
+    /** @test */
+    public function a_product_can_be_deleted()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+        $product = Product::factory()->create();
+
+        $response = $this->actingAs($user)->delete('/products/' . $product->id);
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_product_can_be_deleted_by_only_auth_user()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->delete('/products/' . $product->id);
+        $response->assertRedirect();
     }
 
 }
