@@ -26,6 +26,8 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $user = User::factory()->create();
+
         $file = File::create('my_image.jpg');
 
         Category::factory()->create();
@@ -37,7 +39,7 @@ class ProductTest extends TestCase
             'category_id' => 1,
         ];
 
-        $response = $this->post('/products', $data);
+        $response = $this->actingAs($user)->post('/products', $data);
         $response->assertOk();
 
         $this->assertDatabaseCount('products', 1);
@@ -52,6 +54,8 @@ class ProductTest extends TestCase
     /** @test */
     public function attr_title_is_required_for_storing_product()
     {
+        $user = User::factory()->create();
+
         $file = File::create('my_image.jpg');
 
         Category::factory()->create();
@@ -63,7 +67,7 @@ class ProductTest extends TestCase
             'category_id' => 1,
         ];
 
-        $response = $this->post('/products', $data);
+        $response = $this->actingAs($user)->post('/products', $data);
 
         $response->assertRedirect();
         $response->assertInvalid('title');
@@ -72,6 +76,8 @@ class ProductTest extends TestCase
     /** @test */
     public function attr_description_is_required_for_storing_product()
     {
+        $user = User::factory()->create();
+
         $file = File::create('my_image.jpg');
 
         Category::factory()->create();
@@ -83,7 +89,7 @@ class ProductTest extends TestCase
             'category_id' => 1,
         ];
 
-        $response = $this->post('/products', $data);
+        $response = $this->actingAs($user)->post('/products', $data);
 
         $response->assertRedirect();
         $response->assertInvalid('description');
@@ -92,6 +98,7 @@ class ProductTest extends TestCase
     /** @test */
     public function attr_image_is_required_for_storing_product()
     {
+        $user = User::factory()->create();
 
         Category::factory()->create();
 
@@ -102,7 +109,7 @@ class ProductTest extends TestCase
             'category_id' => 1,
         ];
 
-        $response = $this->post('/products', $data);
+        $response = $this->actingAs($user)->post('/products', $data);
 
         $response->assertRedirect();
         $response->assertInvalid('image');
@@ -111,6 +118,8 @@ class ProductTest extends TestCase
     /** @test */
     public function attr_category_id_is_required_for_storing_product()
     {
+        $user = User::factory()->create();
+
         $file = File::create('my_image.jpg');
 
         Category::factory()->create();
@@ -122,7 +131,7 @@ class ProductTest extends TestCase
             'category_id' => '',
         ];
 
-        $response = $this->post('/products', $data);
+        $response = $this->actingAs($user)->post('/products', $data);
 
         $response->assertRedirect();
         $response->assertInvalid('category_id');
@@ -133,6 +142,8 @@ class ProductTest extends TestCase
     public function a_product_can_be_updated()
     {
         $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
 
         $file = File::create('image.jpg');
 
@@ -147,7 +158,7 @@ class ProductTest extends TestCase
             'category_id' => $newCategoryId,
         ];
 
-        $response = $this->patch('/products/' . $product->id, $data);
+        $response = $this->actingAs($user)->patch('/products/' . $product->id, $data);
         $response->assertOk();
     }
 
@@ -192,9 +203,11 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $user = User::factory()->create();
+
         $product = Product::factory()->create();
 
-        $response = $this->get('/products/' . $product->id . '/edit');
+        $response = $this->actingAs($user)->get('/products/' . $product->id . '/edit');
         $response->assertViewIs('product.edit');
         $response->assertSeeText('This is edit page');
     }
@@ -204,7 +217,9 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->get('/products/create');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/products/create');
         $response->assertViewIs('product.create');
         $response->assertSeeText('This is create page');
     }
@@ -219,6 +234,8 @@ class ProductTest extends TestCase
 
         $response = $this->actingAs($user)->delete('/products/' . $product->id);
         $response->assertRedirect();
+
+        $this->assertSoftDeleted('products');
     }
 
     /** @test */
@@ -228,6 +245,61 @@ class ProductTest extends TestCase
 
         $response = $this->delete('/products/' . $product->id);
         $response->assertRedirect();
+
+        $this->assertDatabaseCount('products', 1);
     }
 
+    /** @test */
+    public function a_view_product_create_can_be_seen_by_only_auth_user()
+    {
+        $response = $this->get('products/create');
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_view_product_edit_can_be_seen_by_only_auth_user()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->get('/products/' . $product->id . '/edit');
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_product_can_be_stored_by_only_auth_user()
+    {
+        $file = File::create('my_image.jpg');
+
+        Category::factory()->create();
+
+        $data = [
+            'title' => 'some title',
+            'description' => 'some desc',
+            'image' => $file,
+            'category_id' => 1
+        ];
+
+        $response = $this->post('/products', $data);
+        $response->assertRedirect();
+    }
+
+    /** @test */
+    public function a_product_can_be_updated_by_only_auth_user()
+    {
+        $file = File::create('image.jpg');
+
+        $newCategoryId = Category::factory()->create()->id;
+
+        $product = Product::factory()->create();
+
+        $data = [
+            'title' => 'upd title',
+            'description' => 'upd desc',
+            'image' => $file,
+            'category_id' => $newCategoryId,
+        ];
+
+        $response = $this->patch('/products/' . $product->id, $data);
+        $response->assertRedirect();
+    }
 }
